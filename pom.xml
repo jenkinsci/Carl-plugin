@@ -7,10 +7,10 @@
     </parent>
 
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>castlite</artifactId>
+    <artifactId>castecho</artifactId>
     <packaging>hpi</packaging>
     <version>1.0.0-SNAPSHOT</version>
-    <name>CASTLite plugin</name>
+    <name>CASTEcho plugin</name>
 
     <developers>
         <developer>

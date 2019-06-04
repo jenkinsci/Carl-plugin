@@ -1,10 +1,10 @@
-package jenkins.plugins.castlite.CastLiteBuilder;
+package jenkins.plugins.castecho.CastEchoBuilder;
 
 def f=namespace(lib.FormTagLib)
 
 if (descriptor.installations.length != 0)  {
-    f.entry(title:_("CastLite version")) {
-        select(class:"setting-input",name:"castlite.installationName") {
+    f.entry(title:_("CastEcho version")) {
+        select(class:"setting-input",name:"castecho.installationName") {
             descriptor.installations.each { install ->
                 f.option(selected:install.name==instance?.installationName, value:install.name) {
                     text(install.name)

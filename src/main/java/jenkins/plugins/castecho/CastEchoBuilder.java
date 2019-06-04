@@ -1,4 +1,4 @@
-package jenkins.plugins.castlite;
+package jenkins.plugins.castecho;
 
 import com.cloudbees.plugins.credentials.common.IdCredentials;
 import hudson.AbortException;
@@ -28,14 +28,14 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import static jenkins.plugins.castlite.CastLiteInstallation.fromName;
+import static jenkins.plugins.castecho.CastEchoInstallation.fromName;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-public class CastLiteBuilder extends Builder implements SimpleBuildStep {
+public class CastEchoBuilder extends Builder implements SimpleBuildStep {
     
     final static int MAX_DISPLAYED_DETAILS = 10;
     
@@ -67,7 +67,7 @@ public class CastLiteBuilder extends Builder implements SimpleBuildStep {
     private boolean displayLog = DescriptorImpl.defaultDisplayLog;
 
     @DataBoundConstructor
-    public CastLiteBuilder(@Nonnull String installationName, @Nonnull String sourcePath, @Nonnull String applicationName)  {
+    public CastEchoBuilder(@Nonnull String installationName, @Nonnull String sourcePath, @Nonnull String applicationName)  {
         this.installationName   = installationName;
         this.sourcePath         = sourcePath.trim();
         this.applicationName    = applicationName.trim();
@@ -116,20 +116,20 @@ public class CastLiteBuilder extends Builder implements SimpleBuildStep {
         String outputPath       = env.expand(this.outputPath);
         
         if (launcher.isUnix())
-            throw new AbortException("CastLite plugin can only work under Windows!");
-        if (CastLiteInstallation.fromName(installationName) == null)
-            throw new AbortException(String.format("CastLite plugin configuration \"%s\" no found!", installationName));
+            throw new AbortException("CastEcho plugin can only work under Windows!");
+        if (CastEchoInstallation.fromName(installationName) == null)
+            throw new AbortException(String.format("CastEcho plugin configuration \"%s\" no found!", installationName));
         FilePath sourceFile = workspace.child(sourcePath);
         if (!sourceFile.exists())
-            throw new AbortException(String.format("Source folder for CastLite analysis not found at %s", sourcePath));
-        FilePath executableFile = CastLiteInstallation.getExecutableFile(installationName, node, env, listener);
+            throw new AbortException(String.format("Source folder for CastEcho analysis not found at %s", sourcePath));
+        FilePath executableFile = CastEchoInstallation.getExecutableFile(installationName, node, env, listener);
         if ((executableFile == null) || !executableFile.exists())
-            throw new AbortException("CastLite executable not found!");
+            throw new AbortException("CastEcho executable not found!");
         FilePath logFile    = workspace.child(logPath);
         FilePath outputFile = workspace.child(outputPath);
         if (logFile.exists() || outputFile.exists())  {
             if (displayLog)
-                logger.println("Removing previous CastLite results...");
+                logger.println("Removing previous CastEcho results...");
             logFile.deleteContents();
             outputFile.deleteContents();
             }
@@ -142,16 +142,16 @@ public class CastLiteBuilder extends Builder implements SimpleBuildStep {
         return (DescriptorImpl)super.getDescriptor();
         }
     
-    @Extension @Symbol("castlite")
+    @Extension @Symbol("castecho")
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
         public static final String defaultQualityGate   = "critical";
-        public static final String defaultLogPath       = "CastLiteResult\\log";
-        public static final String defaultOutputPath    = "CastLiteResult\\output";
+        public static final String defaultLogPath       = "CastEchoResult\\log";
+        public static final String defaultOutputPath    = "CastEchoResult\\output";
         public static final boolean defaultDisplayLog   = true;
         
         @Override
         public String getDisplayName() {
-            return Messages.CastLite_DisplayName();
+            return Messages.CastEcho_DisplayName();
             }
         
         @Override
@@ -159,8 +159,8 @@ public class CastLiteBuilder extends Builder implements SimpleBuildStep {
             return true;
             }
         
-        public CastLiteInstallation[] getInstallations() {
-            return CastLiteInstallation.list();
+        public CastEchoInstallation[] getInstallations() {
+            return CastEchoInstallation.list();
             }
         }
     
@@ -172,7 +172,7 @@ public class CastLiteBuilder extends Builder implements SimpleBuildStep {
     public boolean isDisplayLog()       { return displayLog; }
     
     protected @CheckForNull IdCredentials getDashboardCredential(Run run)  {
-        CastLiteInstallation installation = fromName(installationName);
+        CastEchoInstallation installation = fromName(installationName);
         return (installation == null) ? null : installation.getDashboardCredential(run);
         }
     
@@ -213,7 +213,7 @@ public class CastLiteBuilder extends Builder implements SimpleBuildStep {
         String logPath          = env.expand(this.logPath);
         String outputPath       = env.expand(this.outputPath);
 
-        logger.printf("Starting CastLite analysis of sources located into %s...%n", sourcePath);
+        logger.printf("Starting CastEcho analysis of sources located into %s...%n", sourcePath);
         String executablePath   = executableFile.getRemote();
         FilePath sourceFile     = workspace.child(sourcePath);
         FilePath logFile        = workspace.child(logPath);
@@ -252,24 +252,24 @@ public class CastLiteBuilder extends Builder implements SimpleBuildStep {
         int status = ps.join();
         logger.println("");
         if ( (status == 0) || (status == 2) )  {
-            logger.println("CastLite analysis has finished.");
+            logger.println("CastEcho analysis has finished.");
             FilePath summaryFile = outputFile.child("summary.json");
-            CastLiteResult result = summaryFile.act(new CastLiteResult.Collect());
+            CastEchoResult result = summaryFile.act(new CastEchoResult.Collect());
             if (displayLog)  {
                 logger.printf("Checked rules       : %d%n", result.checkedRuleCount);
                 logger.printf("File count          : %d%n", result.fileCount);
                 logger.printf("Issue count         : %d%n%n", result.issueCount);
                 FilePath detailFile = outputFile.child("DetailsForCastEchoQG.json");
-                CastLiteResultDetail detail = detailFile.act(new CastLiteResultDetail.Collect());
+                CastEchoResultDetail detail = detailFile.act(new CastEchoResultDetail.Collect());
                 if (detail == null)
                     logger.printf("Error reading violation detail!%n");
                 else  {
                     logger.printf("List of violations:%n-------------------%n");
-                    for (CastLiteResultDetail.ViolationType violationType : detail.violationTypes)  {
+                    for (CastEchoResultDetail.ViolationType violationType : detail.violationTypes)  {
                         logger.printf("%s (%d):%n", violationType.name, violationType.count);
-                        violationType.details.sort( (CastLiteResultDetail.Detail a, CastLiteResultDetail.Detail b) -> (int)(b.count - a.count) );
+                        violationType.details.sort( (CastEchoResultDetail.Detail a, CastEchoResultDetail.Detail b) -> (int)(b.count - a.count) );
                         for (int i=0; i<Math.min(MAX_DISPLAYED_DETAILS, violationType.details.size()); i++)  {
-                            CastLiteResultDetail.Detail detail2 = violationType.details.get(i);
+                            CastEchoResultDetail.Detail detail2 = violationType.details.get(i);
                             logger.printf("     %s (%d)%n", detail2.name, detail2.count);
                             }
                         if (violationType.details.size() >= 10)
@@ -279,10 +279,10 @@ public class CastLiteBuilder extends Builder implements SimpleBuildStep {
                     }
                 }
             if (status == 2)
-                throw new AbortException("Too much errors found by CastLite analysis!");
+                throw new AbortException("Too much errors found by CastEcho analysis!");
             }
         else
-            throw new AbortException("CastLite analysis has failed!");
+            throw new AbortException("CastEcho analysis has failed!");
         }
     
     }

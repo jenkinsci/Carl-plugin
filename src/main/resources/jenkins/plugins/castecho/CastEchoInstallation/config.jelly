@@ -3,7 +3,7 @@
     <f:entry title="${%Name}" field="name">
         <f:textbox />
     </f:entry>
-    <f:entry title="${%Path to CastLite folder}" field="home">
+    <f:entry title="${%Path to CastEcho folder}" field="home">
         <f:textbox />
     </f:entry>
     <f:section title="${%Push Results to}">

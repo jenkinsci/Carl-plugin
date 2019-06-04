@@ -1,4 +1,4 @@
-package jenkins.plugins.castlite;
+package jenkins.plugins.castecho;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.IdCredentials;
@@ -31,33 +31,33 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-public class CastLiteInstallation extends ToolInstallation implements NodeSpecific<CastLiteInstallation>, EnvironmentSpecific<CastLiteInstallation> {
+public class CastEchoInstallation extends ToolInstallation implements NodeSpecific<CastEchoInstallation>, EnvironmentSpecific<CastEchoInstallation> {
     
     private final String dashboardAddress;
     private final String credentialsId;
     
     @DataBoundConstructor
-    public CastLiteInstallation(String name, String home, String dashboardAddress, String credentialsId, List<? extends ToolProperty<?>> properties)  {
+    public CastEchoInstallation(String name, String home, String dashboardAddress, String credentialsId, List<? extends ToolProperty<?>> properties)  {
         super(name, home, properties);
         this.dashboardAddress   = dashboardAddress;
         this.credentialsId      = credentialsId;
         }
 
     @Override
-    public CastLiteInstallation forNode(Node node, TaskListener listener) throws IOException, InterruptedException  {
-        return new CastLiteInstallation(getName(), translateFor(node, listener), getDashboardAddress(), getCredentialsId(), getProperties().toList());
+    public CastEchoInstallation forNode(Node node, TaskListener listener) throws IOException, InterruptedException  {
+        return new CastEchoInstallation(getName(), translateFor(node, listener), getDashboardAddress(), getCredentialsId(), getProperties().toList());
         }
 
     @Override
-    public CastLiteInstallation forEnvironment(EnvVars environment)  {
-        return new CastLiteInstallation(getName(), environment.expand(getHome()), getDashboardAddress(), getCredentialsId(), getProperties().toList());
+    public CastEchoInstallation forEnvironment(EnvVars environment)  {
+        return new CastEchoInstallation(getName(), environment.expand(getHome()), getDashboardAddress(), getCredentialsId(), getProperties().toList());
         }
 
     @Override
     public void buildEnvVars(EnvVars env)  {
         String home = Util.fixEmpty(getHome());
         if (home != null)
-            env.put("PATH+CASTLITE", home);
+            env.put("PATH+CASTECHO", home);
         }
     
     public String getDashboardAddress()  {
@@ -72,13 +72,13 @@ public class CastLiteInstallation extends ToolInstallation implements NodeSpecif
         return CredentialsProvider.findCredentialById(credentialsId, IdCredentials.class, run);
         }
 
-    static public CastLiteInstallation[] list()  {
+    static public CastEchoInstallation[] list()  {
         DescriptorImpl descriptor = ToolInstallation.all().get(DescriptorImpl.class);
-        return (descriptor == null) ? new CastLiteInstallation[0] : descriptor.getInstallations();
+        return (descriptor == null) ? new CastEchoInstallation[0] : descriptor.getInstallations();
         }
     
-    static public @CheckForNull CastLiteInstallation fromName(String name)  {
-        for (CastLiteInstallation installation : list())  {
+    static public @CheckForNull CastEchoInstallation fromName(String name)  {
+        for (CastEchoInstallation installation : list())  {
             if (installation.getName().equals(name))
                 return installation;
             }
@@ -86,7 +86,7 @@ public class CastLiteInstallation extends ToolInstallation implements NodeSpecif
         }
     
     static public @CheckForNull FilePath getExecutableFile(String installationName, Node node, EnvVars env, TaskListener listener) throws IOException, InterruptedException  {
-        CastLiteInstallation installation = fromName(installationName);
+        CastEchoInstallation installation = fromName(installationName);
         if (installation == null)
             return null;
         if (node != null)
@@ -102,24 +102,24 @@ public class CastLiteInstallation extends ToolInstallation implements NodeSpecif
         return (homeFilePath == null) ? null : homeFilePath.child("CastEchoQG.exe");
         }
     
-    @Extension @Symbol("castlite")
-    public static class DescriptorImpl extends ToolDescriptor<CastLiteInstallation>  {
+    @Extension @Symbol("castecho")
+    public static class DescriptorImpl extends ToolDescriptor<CastEchoInstallation>  {
         public DescriptorImpl()  {
             load();
             }
         
         @Override
         public String getDisplayName() {
-            return "CastLite";
+            return "CastEcho";
             }
 
         @Override
-        public CastLiteInstallation[] getInstallations() {
+        public CastEchoInstallation[] getInstallations() {
             return super.getInstallations();
             }
 
         @Override
-        public void setInstallations(CastLiteInstallation... installations) {
+        public void setInstallations(CastEchoInstallation... installations) {
             super.setInstallations(installations);
             save();
             }
