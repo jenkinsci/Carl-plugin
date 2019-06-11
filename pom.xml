@@ -10,7 +10,7 @@
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>castecho</artifactId>
     <packaging>hpi</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>CASTEcho plugin</name>
 
     <developers>
@@ -79,7 +79,7 @@
         <connection>scm:git:ssh://github.com/jenkinsci/castecho-plugin.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/castecho-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/castecho-plugin</url>
-        <tag>castecho-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
