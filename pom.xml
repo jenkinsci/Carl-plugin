@@ -75,6 +75,13 @@
         </pluginRepository>
     </pluginRepositories>
 	
+    <scm>
+        <connection>scm:git:ssh://github.com/jenkinsci/castecho-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/castecho-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/castecho-plugin</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <dependencies>
         <!-- Direct dependencies -->
         <dependency>
