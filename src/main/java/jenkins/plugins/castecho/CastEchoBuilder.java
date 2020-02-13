@@ -253,7 +253,9 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
         logger.println("");
         if ( (status == 0) || (status == 2) )  {
             logger.println("CastEcho analysis has finished.");
-            FilePath summaryFile = outputFile.child("summary.json");
+            FilePath summaryFile = outputFile.child("ApplicationSummary.json");
+            if (!summaryFile.exists())
+                throw new AbortException("Result file " + summaryFile.getName() + " does not exists!");
             CastEchoResult result = summaryFile.act(new CastEchoResult.Collect());
             if (displayLog)  {
                 logger.printf("Checked rules       : %d%n", result.checkedRuleCount);
