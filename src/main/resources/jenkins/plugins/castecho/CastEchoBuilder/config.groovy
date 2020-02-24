@@ -38,4 +38,8 @@ f.advanced {
     f.entry(title:_("DisplayLog"), field:"displayLog")  {
         f.checkbox(default:descriptor.defaultDisplayLog)
         }
-    }
+
+    f.entry(title:_("ArchivePdf"), field:"archivePdf")  {
+        f.checkbox(default:descriptor.defaultArchivePdf)
+        }
+}

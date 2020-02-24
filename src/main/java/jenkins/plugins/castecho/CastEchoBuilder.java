@@ -1,6 +1,5 @@
 package jenkins.plugins.castecho;
 
-import com.cloudbees.plugins.credentials.common.IdCredentials;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
@@ -23,13 +22,16 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import static jenkins.plugins.castecho.CastEchoInstallation.fromName;
 import jenkins.tasks.SimpleBuildStep;
+import jenkins.util.BuildListenerAdapter;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -38,6 +40,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 public class CastEchoBuilder extends Builder implements SimpleBuildStep {
     
     final static int MAX_DISPLAYED_DETAILS = 10;
+    final static String PDF_FILENAME = "ApplicationSummary.json";
     
     static protected class GitMetaData {
         String repositoryUrl;
@@ -65,6 +68,7 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
     private String logPath = DescriptorImpl.defaultLogPath;
     private String outputPath = DescriptorImpl.defaultOutputPath;
     private boolean displayLog = DescriptorImpl.defaultDisplayLog;
+    private boolean archivePdf = DescriptorImpl.defaultArchivePdf;
 
     @DataBoundConstructor
     public CastEchoBuilder(@Nonnull String installationName, @Nonnull String sourcePath, @Nonnull String applicationName)  {
@@ -93,6 +97,11 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
         this.displayLog = displayLog;
         }
 
+    @DataBoundSetter
+    public void setArchivePdf(boolean archivePdf)  {
+        this.archivePdf = archivePdf;
+        }
+    
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
@@ -148,6 +157,7 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
         public static final String defaultLogPath       = "CastEchoResult\\log";
         public static final String defaultOutputPath    = "CastEchoResult\\output";
         public static final boolean defaultDisplayLog   = true;
+        public static final boolean defaultArchivePdf   = true;
         
         @Override
         public String getDisplayName() {
@@ -164,17 +174,14 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
             }
         }
     
+    public String getInstallationName() { return installationName; }
     public String getSourcePath()       { return sourcePath; }
     public String getApplicationName()  { return applicationName; }
     public String getQualityGate()      { return qualityGate; }
     public String getLogPath()          { return logPath; }
     public String getOutputPath()       { return outputPath; }
     public boolean isDisplayLog()       { return displayLog; }
-    
-    protected @CheckForNull IdCredentials getDashboardCredential(Run run)  {
-        CastEchoInstallation installation = fromName(installationName);
-        return (installation == null) ? null : installation.getDashboardCredential(run);
-        }
+    public boolean isArchivePdf()       { return archivePdf; }
     
     protected @CheckForNull GitMetaData getGitMetaData(Run<?, ?> run)  {
         GitSCM git = getFirstGitSCM(run.getParent());
@@ -255,7 +262,7 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
             logger.println("CastEcho analysis has finished.");
             FilePath summaryFile = outputFile.child("ApplicationSummary.json");
             if (!summaryFile.exists())
-                throw new AbortException("Result file " + summaryFile.getName() + " does not exists!");
+                throw new AbortException("Result analysis file " + summaryFile.getName() + " does not exists!");
             CastEchoResult result = summaryFile.act(new CastEchoResult.Collect());
             if (displayLog)  {
                 logger.printf("Checked rules       : %d%n", result.checkedRuleCount);
@@ -280,11 +287,26 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
                     logger.println();
                     }
                 }
+            if (archivePdf)  {
+                FilePath pdfFile = outputFile.child(PDF_FILENAME);
+                if (pdfFile.exists())  {
+                    Map<String,String> artifacts = new LinkedHashMap<>();
+                    artifacts.put(summaryFile.getName(), relativeToWorkspace(workspace, summaryFile));
+                    run.pickArtifactManager().archive(workspace, launcher, BuildListenerAdapter.wrap(listener), artifacts);
+                    }
+                else
+                    logger.println("Missing analysis pdf cannot be archived!");
+                }
             if (status == 2)
                 throw new AbortException("Too much errors found by CastEcho analysis!");
             }
         else
             throw new AbortException("CastEcho analysis has failed!");
+        }
+    
+    private String relativeToWorkspace(FilePath ws, FilePath path) throws IOException, InterruptedException {
+        URI relUri = ws.toURI().relativize(path.toURI());
+        return relUri.getPath().replaceFirst("/$", "");
         }
     
     }

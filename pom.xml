@@ -4,15 +4,19 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>3.43</version>
-        <relativePath />
     </parent>
 
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>castecho</artifactId>
+    <name>CastEcho plugin</name>
     <packaging>hpi</packaging>
     <version>1.0.1-SNAPSHOT</version>
-    <name>CASTEcho plugin</name>
-
+    <description>
+        This plugin provide allow use of CastEcho to analyse your code. It allows to change build result depending on the analysis of some specified sources.
+        For more information about the plugin visit the wiki site.
+    </description>
+    <url>https://plugins.jenkins.io/castecho/</url>
+    
     <developers>
         <developer>
             <id>tpouit</id>
@@ -47,14 +51,26 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <tests.installPath>${castechoTests.installPath}</tests.installPath>
+                        <tests.badSourcesPath>${castechoTests.badSourcesPath}</tests.badSourcesPath>
+                        <tests.correctSourcesPath>${castechoTests.correctSourcesPath}</tests.correctSourcesPath>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <configuration>
                     <failOnError>${findbugs.failOnError}</failOnError>
                 </configuration>
-            </plugin>        
+            </plugin>
         </plugins>
     </build>
+    
     <properties>
         <jenkins.version>2.150.3</jenkins.version>
         <java.level>8</java.level>
@@ -98,7 +114,7 @@
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
-        </dependency>        
+        </dependency>
         <!-- Indirect dependencies -->
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
@@ -129,6 +145,17 @@
             <groupId>org.jenkins-ci</groupId>
             <artifactId>annotation-indexer</artifactId>
             <version>1.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <artifactId>junit</artifactId>
+            <groupId>junit</groupId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

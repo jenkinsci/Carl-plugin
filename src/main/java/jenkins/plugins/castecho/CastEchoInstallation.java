@@ -1,56 +1,39 @@
 package jenkins.plugins.castecho;
 
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.common.IdCredentials;
-import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
-import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Util;
 import hudson.model.EnvironmentSpecific;
-import hudson.model.Item;
 import hudson.model.Node;
-import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.security.ACL;
 import hudson.slaves.NodeSpecific;
 import hudson.tools.ToolDescriptor;
 import hudson.tools.ToolInstallation;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
-import hudson.util.ListBoxModel;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import javax.annotation.CheckForNull;
-import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 
 public class CastEchoInstallation extends ToolInstallation implements NodeSpecific<CastEchoInstallation>, EnvironmentSpecific<CastEchoInstallation> {
     
-    private final String dashboardAddress;
-    private final String credentialsId;
-    
     @DataBoundConstructor
-    public CastEchoInstallation(String name, String home, String dashboardAddress, String credentialsId, List<? extends ToolProperty<?>> properties)  {
+    public CastEchoInstallation(String name, String home, List<? extends ToolProperty<?>> properties)  {
         super(name, home, properties);
-        this.dashboardAddress   = dashboardAddress;
-        this.credentialsId      = credentialsId;
         }
 
     @Override
     public CastEchoInstallation forNode(Node node, TaskListener listener) throws IOException, InterruptedException  {
-        return new CastEchoInstallation(getName(), translateFor(node, listener), getDashboardAddress(), getCredentialsId(), getProperties().toList());
+        return new CastEchoInstallation(getName(), translateFor(node, listener), getProperties().toList());
         }
 
     @Override
     public CastEchoInstallation forEnvironment(EnvVars environment)  {
-        return new CastEchoInstallation(getName(), environment.expand(getHome()), getDashboardAddress(), getCredentialsId(), getProperties().toList());
+        return new CastEchoInstallation(getName(), environment.expand(getHome()), getProperties().toList());
         }
 
     @Override
@@ -60,18 +43,6 @@ public class CastEchoInstallation extends ToolInstallation implements NodeSpecif
             env.put("PATH+CASTECHO", home);
         }
     
-    public String getDashboardAddress()  {
-        return dashboardAddress;
-        }
-    
-    public String getCredentialsId()  {
-        return credentialsId;
-        }
-    
-    public IdCredentials getDashboardCredential(Run run)  {
-        return CredentialsProvider.findCredentialById(credentialsId, IdCredentials.class, run);
-        }
-
     static public CastEchoInstallation[] list()  {
         DescriptorImpl descriptor = ToolInstallation.all().get(DescriptorImpl.class);
         return (descriptor == null) ? new CastEchoInstallation[0] : descriptor.getInstallations();
@@ -128,20 +99,6 @@ public class CastEchoInstallation extends ToolInstallation implements NodeSpecif
         public List<? extends ToolInstaller> getDefaultInstallers() {
             return super.getDefaultInstallers();
             }
-
-        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item context, @QueryParameter String credentialsId) {
-            Jenkins jenkins = Jenkins.getInstanceOrNull();
-            if (jenkins == null)
-                return null;
-            
-            if (!jenkins.hasPermission(Jenkins.ADMINISTER))
-                return new StandardListBoxModel().includeCurrentValue(credentialsId);
-
-            return new StandardUsernameListBoxModel()
-                    .includeEmptyValue()
-                    .includeAs(ACL.SYSTEM, jenkins, UsernamePasswordCredentialsImpl.class)
-                    .includeCurrentValue(credentialsId);
-            }    
         }
     
     }
