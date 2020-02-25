@@ -59,6 +59,7 @@
                         <tests.badSourcesPath>${castechoTests.badSourcesPath}</tests.badSourcesPath>
                         <tests.correctSourcesPath>${castechoTests.correctSourcesPath}</tests.correctSourcesPath>
                     </systemPropertyVariables>
+                    <rerunFailingTestsCount>0</rerunFailingTestsCount>   <!-- disable rerun of flaky tests defined in jenkins-test-harness --> 
                 </configuration>
             </plugin>
             <plugin>
