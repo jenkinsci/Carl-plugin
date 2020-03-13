@@ -1,4 +1,4 @@
-package jenkins.plugins.castecho;
+package jenkins.plugins.carl;
 
 import hudson.EnvVars;
 import hudson.Extension;
@@ -19,37 +19,37 @@ import javax.annotation.CheckForNull;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-public class CastEchoInstallation extends ToolInstallation implements NodeSpecific<CastEchoInstallation>, EnvironmentSpecific<CastEchoInstallation> {
+public class CarlInstallation extends ToolInstallation implements NodeSpecific<CarlInstallation>, EnvironmentSpecific<CarlInstallation> {
     
     @DataBoundConstructor
-    public CastEchoInstallation(String name, String home, List<? extends ToolProperty<?>> properties)  {
+    public CarlInstallation(String name, String home, List<? extends ToolProperty<?>> properties)  {
         super(name, home, properties);
         }
 
     @Override
-    public CastEchoInstallation forNode(Node node, TaskListener listener) throws IOException, InterruptedException  {
-        return new CastEchoInstallation(getName(), translateFor(node, listener), getProperties().toList());
+    public CarlInstallation forNode(Node node, TaskListener listener) throws IOException, InterruptedException  {
+        return new CarlInstallation(getName(), translateFor(node, listener), getProperties().toList());
         }
 
     @Override
-    public CastEchoInstallation forEnvironment(EnvVars environment)  {
-        return new CastEchoInstallation(getName(), environment.expand(getHome()), getProperties().toList());
+    public CarlInstallation forEnvironment(EnvVars environment)  {
+        return new CarlInstallation(getName(), environment.expand(getHome()), getProperties().toList());
         }
 
     @Override
     public void buildEnvVars(EnvVars env)  {
         String home = Util.fixEmpty(getHome());
         if (home != null)
-            env.put("PATH+CASTECHO", home);
+            env.put("PATH+CARL", home);
         }
     
-    static public CastEchoInstallation[] list()  {
+    static public CarlInstallation[] list()  {
         DescriptorImpl descriptor = ToolInstallation.all().get(DescriptorImpl.class);
-        return (descriptor == null) ? new CastEchoInstallation[0] : descriptor.getInstallations();
+        return (descriptor == null) ? new CarlInstallation[0] : descriptor.getInstallations();
         }
     
-    static public @CheckForNull CastEchoInstallation fromName(String name)  {
-        for (CastEchoInstallation installation : list())  {
+    static public @CheckForNull CarlInstallation fromName(String name)  {
+        for (CarlInstallation installation : list())  {
             if (installation.getName().equals(name))
                 return installation;
             }
@@ -57,7 +57,7 @@ public class CastEchoInstallation extends ToolInstallation implements NodeSpecif
         }
     
     static public @CheckForNull FilePath getExecutableFile(String installationName, Node node, EnvVars env, TaskListener listener) throws IOException, InterruptedException  {
-        CastEchoInstallation installation = fromName(installationName);
+        CarlInstallation installation = fromName(installationName);
         if (installation == null)
             return null;
         if (node != null)
@@ -70,27 +70,27 @@ public class CastEchoInstallation extends ToolInstallation implements NodeSpecif
         
         File homeFile = new File(home);
         FilePath homeFilePath = (node == null) ? new FilePath(homeFile) : node.createPath(home);
-        return (homeFilePath == null) ? null : homeFilePath.child("CastEchoQG.exe");
+        return (homeFilePath == null) ? null : homeFilePath.child("CarlQG.exe");
         }
     
-    @Extension @Symbol("castecho")
-    public static class DescriptorImpl extends ToolDescriptor<CastEchoInstallation>  {
+    @Extension @Symbol("carl")
+    public static class DescriptorImpl extends ToolDescriptor<CarlInstallation>  {
         public DescriptorImpl()  {
             load();
             }
         
         @Override
         public String getDisplayName() {
-            return "CastEcho";
+            return "Carl";
             }
 
         @Override
-        public CastEchoInstallation[] getInstallations() {
+        public CarlInstallation[] getInstallations() {
             return super.getInstallations();
             }
 
         @Override
-        public void setInstallations(CastEchoInstallation... installations) {
+        public void setInstallations(CarlInstallation... installations) {
             super.setInstallations(installations);
             save();
             }

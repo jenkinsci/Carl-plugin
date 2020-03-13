@@ -1,4 +1,4 @@
-package jenkins.plugins.castecho;
+package jenkins.plugins.carl;
 
 import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
@@ -12,20 +12,20 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class CastEchoResult implements Serializable {
+public class CarlResult implements Serializable {
     
     long checkedRuleCount;
     long fileCount;
     long issueCount;
     
-    static final class Collect implements FilePath.FileCallable<CastEchoResult>  {
+    static final class Collect implements FilePath.FileCallable<CarlResult>  {
         @Override
-        public CastEchoResult invoke(File f, VirtualChannel channel)  {
+        public CarlResult invoke(File f, VirtualChannel channel)  {
             JSONParser jsonParser = new JSONParser();
-            CastEchoResult result = null;
+            CarlResult result = null;
             try (InputStreamReader reader = new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8))  {
                 JSONObject summary = (JSONObject)jsonParser.parse(reader);
-                result = new CastEchoResult();
+                result = new CarlResult();
                 result.checkedRuleCount     = (long)summary.get("Count of affected Rules");
                 result.fileCount            = (long)summary.get("Total count of Files");
                 result.issueCount           = (long)summary.get("Total number of issues");
@@ -38,6 +38,6 @@ public class CastEchoResult implements Serializable {
         public void checkRoles(org.jenkinsci.remoting.RoleChecker checker) throws SecurityException  { }
         }
     
-    protected CastEchoResult()  { }
+    protected CarlResult()  { }
 
     }

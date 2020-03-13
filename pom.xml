@@ -7,15 +7,15 @@
     </parent>
 
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>castecho</artifactId>
-    <name>CastEcho plugin</name>
+    <artifactId>carl</artifactId>
+    <name>Carl plugin</name>
     <packaging>hpi</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <description>
-        This plugin provide allow use of CastEcho to analyse your code. It allows to change build result depending on the analysis of some specified sources.
+        This plugin allow use of Carl to analyse your code. It allows to change build result depending on the analysis of some specified sources.
         For more information about the plugin visit the wiki site.
     </description>
-    <url>https://plugins.jenkins.io/castecho/</url>
+    <url>https://plugins.jenkins.io/carl/</url>
     
     <developers>
         <developer>
@@ -55,9 +55,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <tests.installPath>${castechoTests.installPath}</tests.installPath>
-                        <tests.badSourcesPath>${castechoTests.badSourcesPath}</tests.badSourcesPath>
-                        <tests.correctSourcesPath>${castechoTests.correctSourcesPath}</tests.correctSourcesPath>
+                        <tests.installPath>${carlTests.installPath}</tests.installPath>
+                        <tests.badSourcesPath>${carlTests.badSourcesPath}</tests.badSourcesPath>
+                        <tests.correctSourcesPath>${carlTests.correctSourcesPath}</tests.correctSourcesPath>
                     </systemPropertyVariables>
                     <rerunFailingTestsCount>0</rerunFailingTestsCount>   <!-- disable rerun of flaky tests defined in jenkins-test-harness --> 
                 </configuration>
@@ -93,9 +93,9 @@
     </pluginRepositories>
 	
     <scm>
-        <connection>scm:git:ssh://github.com/jenkinsci/castecho-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/castecho-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/castecho-plugin</url>
+        <connection>scm:git:ssh://github.com/jenkinsci/carl-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/carl-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/carl-plugin</url>
         <tag>HEAD</tag>
     </scm>
 

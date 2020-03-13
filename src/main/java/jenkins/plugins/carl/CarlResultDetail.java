@@ -1,4 +1,4 @@
-package jenkins.plugins.castecho;
+package jenkins.plugins.carl;
 
 import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
@@ -16,7 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class CastEchoResultDetail implements Serializable {
+public class CarlResultDetail implements Serializable {
     private  static  final  long serialVersionUID = 1350092991346723535L;
     
     static class Detail implements Serializable  {
@@ -34,16 +34,16 @@ public class CastEchoResultDetail implements Serializable {
 
     LinkedList<ViolationType> violationTypes;
     
-    protected CastEchoResultDetail()  { violationTypes = new LinkedList<>(); }
+    protected CarlResultDetail()  { violationTypes = new LinkedList<>(); }
     
-    static final class Collect implements FilePath.FileCallable<CastEchoResultDetail>  {
+    static final class Collect implements FilePath.FileCallable<CarlResultDetail>  {
         @Override
-        public CastEchoResultDetail invoke(File f, VirtualChannel channel)  {
+        public CarlResultDetail invoke(File f, VirtualChannel channel)  {
             JSONParser jsonParser = new JSONParser();
-            CastEchoResultDetail result = null;
+            CarlResultDetail result = null;
             try (InputStreamReader reader = new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8))  {
                 JSONArray jsonMain = (JSONArray)jsonParser.parse(reader);
-                result = new CastEchoResultDetail();
+                result = new CarlResultDetail();
                 for (Object _jsonViolation : jsonMain)  {
                     JSONObject jsonViolation = (JSONObject)_jsonViolation;
                     ViolationType violation = new ViolationType((String)jsonViolation.get("Tag Name"), (long)jsonViolation.get("Number of violation"));

@@ -1,10 +1,10 @@
-package jenkins.plugins.castecho.CastEchoBuilder;
+package jenkins.plugins.carl.CarlBuilder;
 
 def f=namespace(lib.FormTagLib)
 
 if (descriptor.installations.length != 0)  {
-    f.entry(title:_("CastEcho version")) {
-        select(class:"setting-input",name:"castecho.installationName") {
+    f.entry(title:_("Carl version")) {
+        select(class:"setting-input",name:"carl.installationName") {
             descriptor.installations.each { install ->
                 f.option(selected:install.name==instance?.installationName, value:install.name) {
                     text(install.name)

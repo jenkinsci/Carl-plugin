@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package jenkins.plugins.castecho;
+package jenkins.plugins.carl;
 
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import hudson.EnvVars;
@@ -40,7 +40,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.xml.sax.SAXException;
 
 
-public class CastEchoInstallationTest {
+public class CarlInstallationTest {
     
     static final String CONFIG_NAME = "test name";
     static final String CONFIG_HOME = "test\\Home";
@@ -48,10 +48,10 @@ public class CastEchoInstallationTest {
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
     
-    private final CastEchoInstallation installation;
+    private final CarlInstallation installation;
     
-    public CastEchoInstallationTest()  {
-        installation = new CastEchoInstallation(CONFIG_NAME, CONFIG_HOME, new ArrayList<InstallSourceProperty>());
+    public CarlInstallationTest()  {
+        installation = new CarlInstallation(CONFIG_NAME, CONFIG_HOME, new ArrayList<InstallSourceProperty>());
         }
     
     @Test
@@ -67,7 +67,7 @@ public class CastEchoInstallationTest {
     @Test
     public void testFromName()  {
         initToolInstallation();
-        assertThat(CastEchoInstallation.fromName(CONFIG_NAME), is(notNullValue()));
+        assertThat(CarlInstallation.fromName(CONFIG_NAME), is(notNullValue()));
         }
     
     @Test
@@ -75,28 +75,28 @@ public class CastEchoInstallationTest {
         DumbSlave agent = jenkinsRule.createSlave();
         agent.setMode(Node.Mode.EXCLUSIVE);
         TaskListener log = StreamTaskListener.fromStdout();
-        CastEchoInstallation install = installation.forNode(agent, log);
+        CarlInstallation install = installation.forNode(agent, log);
         assertEquals(installation.getHome(), install.getHome());
     }
 
     @Test
     public void testForEnvironment() throws Exception  {
-        CastEchoInstallation installation2 = new CastEchoInstallation("TestName2", "$VAR1\\$VAR2", new ArrayList<InstallSourceProperty>());
+        CarlInstallation installation2 = new CarlInstallation("TestName2", "$VAR1\\$VAR2", new ArrayList<InstallSourceProperty>());
         EnvVars env = new EnvVars();
         env.put("VAR1", "path 1");
         env.put("VAR2", "path 2");
-        CastEchoInstallation install = installation2.forEnvironment(env);
+        CarlInstallation install = installation2.forEnvironment(env);
         assertEquals(install.getHome(), "path 1\\path 2");
         }
     
     @Test
     public void testPresenceInJenkinsConfig() throws IOException, SAXException  {
         HtmlPage page = jenkinsRule.createWebClient().goTo("configureTools");
-        assertEquals("Expect to find one instance of CastEcho", page.getElementsByName("jenkins-plugins-castecho-CastEchoInstallation").size(), 1);
+        assertEquals("Expect to find one instance of Carl", page.getElementsByName("jenkins-plugins-carl-CarlInstallation").size(), 1);
         }
     
     private void initToolInstallation()  {
-        CastEchoInstallation.DescriptorImpl descriptor = (CastEchoInstallation.DescriptorImpl) jenkinsRule.jenkins.getDescriptor(CastEchoInstallation.class);
+        CarlInstallation.DescriptorImpl descriptor = (CarlInstallation.DescriptorImpl) jenkinsRule.jenkins.getDescriptor(CarlInstallation.class);
         descriptor.setInstallations(installation);
         }
     

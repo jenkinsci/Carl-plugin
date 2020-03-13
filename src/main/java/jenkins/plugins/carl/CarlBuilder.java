@@ -1,4 +1,4 @@
-package jenkins.plugins.castecho;
+package jenkins.plugins.carl;
 
 import hudson.AbortException;
 import hudson.EnvVars;
@@ -37,7 +37,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-public class CastEchoBuilder extends Builder implements SimpleBuildStep {
+public class CarlBuilder extends Builder implements SimpleBuildStep {
     
     final static int MAX_DISPLAYED_DETAILS = 10;
     final static String PDF_FILENAME = "ApplicationSummary.json";
@@ -71,7 +71,7 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
     private boolean archivePdf = DescriptorImpl.defaultArchivePdf;
 
     @DataBoundConstructor
-    public CastEchoBuilder(@Nonnull String installationName, @Nonnull String sourcePath, @Nonnull String applicationName)  {
+    public CarlBuilder(@Nonnull String installationName, @Nonnull String sourcePath, @Nonnull String applicationName)  {
         this.installationName   = installationName;
         this.sourcePath         = sourcePath.trim();
         this.applicationName    = applicationName.trim();
@@ -125,20 +125,20 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
         String outputPath       = env.expand(this.outputPath);
         
         if (launcher.isUnix())
-            throw new AbortException("CastEcho plugin can only work under Windows!");
-        if (CastEchoInstallation.fromName(installationName) == null)
-            throw new AbortException(String.format("CastEcho plugin configuration \"%s\" no found!", installationName));
+            throw new AbortException("Carl plugin can only work under Windows!");
+        if (CarlInstallation.fromName(installationName) == null)
+            throw new AbortException(String.format("Carl plugin configuration \"%s\" no found!", installationName));
         FilePath sourceFile = workspace.child(sourcePath);
         if (!sourceFile.exists())
-            throw new AbortException(String.format("Source folder for CastEcho analysis not found at %s", sourcePath));
-        FilePath executableFile = CastEchoInstallation.getExecutableFile(installationName, node, env, listener);
+            throw new AbortException(String.format("Source folder for Carl analysis not found at %s", sourcePath));
+        FilePath executableFile = CarlInstallation.getExecutableFile(installationName, node, env, listener);
         if ((executableFile == null) || !executableFile.exists())
-            throw new AbortException("CastEcho executable not found!");
+            throw new AbortException("Carl executable not found!");
         FilePath logFile    = workspace.child(logPath);
         FilePath outputFile = workspace.child(outputPath);
         if (logFile.exists() || outputFile.exists())  {
             if (displayLog)
-                logger.println("Removing previous CastEcho results...");
+                logger.println("Removing previous Carl results...");
             logFile.deleteContents();
             outputFile.deleteContents();
             }
@@ -151,17 +151,17 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
         return (DescriptorImpl)super.getDescriptor();
         }
     
-    @Extension @Symbol("castecho")
+    @Extension @Symbol("carl")
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
         public static final String defaultQualityGate   = "critical";
-        public static final String defaultLogPath       = "CastEchoResult\\log";
-        public static final String defaultOutputPath    = "CastEchoResult\\output";
+        public static final String defaultLogPath       = "CarlResult\\log";
+        public static final String defaultOutputPath    = "CarlResult\\output";
         public static final boolean defaultDisplayLog   = true;
         public static final boolean defaultArchivePdf   = true;
         
         @Override
         public String getDisplayName() {
-            return Messages.CastEcho_DisplayName();
+            return Messages.Carl_DisplayName();
             }
         
         @Override
@@ -169,8 +169,8 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
             return true;
             }
         
-        public CastEchoInstallation[] getInstallations() {
-            return CastEchoInstallation.list();
+        public CarlInstallation[] getInstallations() {
+            return CarlInstallation.list();
             }
         }
     
@@ -220,7 +220,7 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
         String logPath          = env.expand(this.logPath);
         String outputPath       = env.expand(this.outputPath);
 
-        logger.printf("Starting CastEcho analysis of sources located into %s...%n", sourcePath);
+        logger.printf("Starting Carl analysis of sources located into %s...%n", sourcePath);
         String executablePath   = executableFile.getRemote();
         FilePath sourceFile     = workspace.child(sourcePath);
         FilePath logFile        = workspace.child(logPath);
@@ -259,26 +259,26 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
         int status = ps.join();
         logger.println("");
         if ( (status == 0) || (status == 2) )  {
-            logger.println("CastEcho analysis has finished.");
+            logger.println("Carl analysis has finished.");
             FilePath summaryFile = outputFile.child("ApplicationSummary.json");
             if (!summaryFile.exists())
                 throw new AbortException("Result analysis file " + summaryFile.getName() + " does not exists!");
-            CastEchoResult result = summaryFile.act(new CastEchoResult.Collect());
+            CarlResult result = summaryFile.act(new CarlResult.Collect());
             if (displayLog)  {
                 logger.printf("Checked rules       : %d%n", result.checkedRuleCount);
                 logger.printf("File count          : %d%n", result.fileCount);
                 logger.printf("Issue count         : %d%n%n", result.issueCount);
-                FilePath detailFile = outputFile.child("DetailsForCastEchoQG.json");
-                CastEchoResultDetail detail = detailFile.act(new CastEchoResultDetail.Collect());
+                FilePath detailFile = outputFile.child("DetailsForCarlQG.json");
+                CarlResultDetail detail = detailFile.act(new CarlResultDetail.Collect());
                 if (detail == null)
                     logger.printf("Error reading violation detail!%n");
                 else  {
                     logger.printf("List of violations:%n-------------------%n");
-                    for (CastEchoResultDetail.ViolationType violationType : detail.violationTypes)  {
+                    for (CarlResultDetail.ViolationType violationType : detail.violationTypes)  {
                         logger.printf("%s (%d):%n", violationType.name, violationType.count);
-                        violationType.details.sort( (CastEchoResultDetail.Detail a, CastEchoResultDetail.Detail b) -> (int)(b.count - a.count) );
+                        violationType.details.sort( (CarlResultDetail.Detail a, CarlResultDetail.Detail b) -> (int)(b.count - a.count) );
                         for (int i=0; i<Math.min(MAX_DISPLAYED_DETAILS, violationType.details.size()); i++)  {
-                            CastEchoResultDetail.Detail detail2 = violationType.details.get(i);
+                            CarlResultDetail.Detail detail2 = violationType.details.get(i);
                             logger.printf("     %s (%d)%n", detail2.name, detail2.count);
                             }
                         if (violationType.details.size() >= 10)
@@ -298,10 +298,10 @@ public class CastEchoBuilder extends Builder implements SimpleBuildStep {
                     logger.println("Missing analysis pdf cannot be archived!");
                 }
             if (status == 2)
-                throw new AbortException("Too much errors found by CastEcho analysis!");
+                throw new AbortException("Too much errors found by Carl analysis!");
             }
         else
-            throw new AbortException("CastEcho analysis has failed!");
+            throw new AbortException("Carl analysis has failed!");
         }
     
     private String relativeToWorkspace(FilePath ws, FilePath path) throws IOException, InterruptedException {
