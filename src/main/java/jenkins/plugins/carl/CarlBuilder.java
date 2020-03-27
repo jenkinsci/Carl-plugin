@@ -287,7 +287,8 @@ public class CarlBuilder extends Builder implements SimpleBuildStep {
                     logger.println();
                     }
                 }
-            if (archivePdf)  {
+//TODO: below code is not for this version. And PDF_FILENAME must be correctly set (for now it just a dummy file)
+/*            if (archivePdf)  {
                 FilePath pdfFile = outputFile.child(PDF_FILENAME);
                 if (pdfFile.exists())  {
                     Map<String,String> artifacts = new LinkedHashMap<>();
@@ -296,7 +297,7 @@ public class CarlBuilder extends Builder implements SimpleBuildStep {
                     }
                 else
                     logger.println("Missing analysis pdf cannot be archived!");
-                }
+                }*/
             if (status == 2)
                 throw new AbortException("Too much errors found by Carl analysis!");
             }
