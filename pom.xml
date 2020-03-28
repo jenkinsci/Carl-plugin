@@ -10,7 +10,7 @@
     <artifactId>carl</artifactId>
     <name>Carl plugin</name>
     <packaging>hpi</packaging>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <description>
         This plugin allow use of Carl to analyse your code. It allows to change build result depending on the analysis of some specified sources.
         For more information about the plugin visit the wiki site.
@@ -96,7 +96,7 @@
         <connection>scm:git:ssh://github.com/jenkinsci/carl-plugin.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/carl-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/carl-plugin</url>
-        <tag>carl-1.0.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
